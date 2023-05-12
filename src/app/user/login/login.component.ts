@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-login',
@@ -12,12 +13,32 @@ export class LoginComponent {
   };
 
   showAlert = false;
-  alertMsg = 'Please wait! You are logging in';
+  alertMsg = 'Please wait! We are logging you in.';
   alertColor = 'blue';
 
-  login() {
+  inSubmission = false;
+
+  constructor(private auth: AngularFireAuth) {}
+
+  async login() {
     this.showAlert = true;
-    this.alertMsg = 'Please wait! You are logging in';
+    this.alertMsg = 'Please wait! We are logging you in.';
     this.alertColor = 'blue';
+    this.inSubmission = true;
+
+    try {
+      const userCred = await this.auth.signInWithEmailAndPassword(
+        this.credentials.email,
+        this.credentials.password
+      );
+    } catch (err) {
+      console.log(err);
+      this.alertMsg = 'Something went wrong! Please try again later.';
+      this.alertColor = 'red';
+      this.inSubmission = false;
+    }
+
+    this.alertColor = 'green';
+    this.alertMsg = 'Success! You are logged in.';
   }
 }
